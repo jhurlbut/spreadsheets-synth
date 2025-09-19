@@ -18,7 +18,7 @@ Resistance: Active
 5. Clear the sonic cache: `killall -9 AudioComponentRegistrar`
 6. Rescan in your DAW (the midnight protocol)
 
-#### VST3 (909 Kick Pattern)
+#### VST3 (x0x Pattern)
 1. Download `SpreadsheetsSynth_VST3_v1.0.0.zip`
 2. Decompress the rhythm matrix
 3. Navigate to coordinates: `~/Library/Audio/Plug-Ins/VST3/`
@@ -94,7 +94,7 @@ auval -a | grep -i spreadsheet
 - **Operating Voltage:** ±12V (People Mover compatible)
 - **Temperature:** 313K (constant)
 - **Timeline:** Past/Future/Now
-- **RAM:** Minimum 606MB (Roland reference)
+- **RAM:** Minimum 606MB
 - **CPU:** Any processor that understands the funk
 
 ## UNINSTALL SEQUENCE [RETURN TO ZERO]
@@ -113,7 +113,7 @@ Delete the plugin from its installation coordinates.
 If all channels fail, transmit distress signal to:
 - Repository: [ENCRYPTED]/spreadsheets-synth
 - Frequency: @spreadsheets_band
-- Underground Railroad: GitHub Issues
+- Underground SUBCulture: GitHub Issues
 
 ---
 

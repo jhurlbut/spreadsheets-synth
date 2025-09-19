@@ -30,7 +30,7 @@ void CRTShaderOverlay::drawScanlines(juce::Graphics& g)
     auto bounds = getLocalBounds().toFloat();
 
     // Horizontal scanlines
-    g.setColour(juce::Colour(0x00FF00).withAlpha(0.05f * flickerAmount));
+    g.setColour(juce::Colours::white.withAlpha(0.05f * flickerAmount));
 
     float lineHeight = 2.0f;
     float spacing = 3.0f;
@@ -60,7 +60,7 @@ void CRTShaderOverlay::drawPhosphorGlow(juce::Graphics& g)
 
     // Top glow
     edgeGlow = juce::ColourGradient(
-        juce::Colour(0x00FF00).withAlpha(0.1f),
+        juce::Colours::white.withAlpha(0.1f),
         0, 0,
         juce::Colours::transparentBlack,
         0, 30,
@@ -70,7 +70,7 @@ void CRTShaderOverlay::drawPhosphorGlow(juce::Graphics& g)
 
     // Bottom glow
     edgeGlow = juce::ColourGradient(
-        juce::Colour(0x00FF00).withAlpha(0.1f),
+        juce::Colours::white.withAlpha(0.1f),
         0, bounds.getHeight(),
         juce::Colours::transparentBlack,
         0, bounds.getHeight() - 30,
@@ -80,7 +80,7 @@ void CRTShaderOverlay::drawPhosphorGlow(juce::Graphics& g)
 
     // Left glow
     edgeGlow = juce::ColourGradient(
-        juce::Colour(0x00FF00).withAlpha(0.1f),
+        juce::Colours::white.withAlpha(0.1f),
         0, 0,
         juce::Colours::transparentBlack,
         30, 0,
@@ -90,7 +90,7 @@ void CRTShaderOverlay::drawPhosphorGlow(juce::Graphics& g)
 
     // Right glow
     edgeGlow = juce::ColourGradient(
-        juce::Colour(0x00FF00).withAlpha(0.1f),
+        juce::Colours::white.withAlpha(0.1f),
         bounds.getWidth(), 0,
         juce::Colours::transparentBlack,
         bounds.getWidth() - 30, 0,
@@ -151,36 +151,60 @@ void CRTShaderOverlay::drawGlitchEffect(juce::Graphics& g)
     auto bounds = getLocalBounds().toFloat();
 
     // Random horizontal displacement lines
-    for (int i = 0; i < 5; ++i)
+    for (int i = 0; i < 10; ++i)
     {
         float y = random.nextFloat() * bounds.getHeight();
-        float height = 2.0f + random.nextFloat() * 10.0f;
-        float displacement = (random.nextFloat() - 0.5f) * 20.0f;
+        float height = 2.0f + random.nextFloat() * 20.0f;
+        float displacement = (random.nextFloat() - 0.5f) * 40.0f;
 
-        // Create RGB separation effect
-        g.setColour(juce::Colour(0xFF0000).withAlpha(0.3f));
+        // Create monochrome glitch separation
+        g.setColour(juce::Colours::white.withAlpha(0.4f));
         g.fillRect(displacement - 2, y, bounds.getWidth(), height);
 
-        g.setColour(juce::Colour(0x00FF00).withAlpha(0.3f));
+        g.setColour(juce::Colours::black);
         g.fillRect(displacement, y, bounds.getWidth(), height);
 
-        g.setColour(juce::Colour(0x0000FF).withAlpha(0.3f));
+        g.setColour(juce::Colours::white.withAlpha(0.2f));
         g.fillRect(displacement + 2, y, bounds.getWidth(), height);
     }
 
+    // Vertical displacement lines (new)
+    for (int i = 0; i < 5; ++i)
+    {
+        float x = random.nextFloat() * bounds.getWidth();
+        float width = 2.0f + random.nextFloat() * 15.0f;
+        float displacement = (random.nextFloat() - 0.5f) * 30.0f;
+
+        g.setColour(random.nextBool() ? juce::Colours::white.withAlpha(0.5f) : juce::Colours::black);
+        g.fillRect(x, displacement, width, bounds.getHeight());
+    }
+
+    // Random inversion blocks (new)
+    for (int i = 0; i < 4; ++i)
+    {
+        float x = random.nextFloat() * bounds.getWidth();
+        float y = random.nextFloat() * bounds.getHeight();
+        float w = 20.0f + random.nextFloat() * 100.0f;
+        float h = 20.0f + random.nextFloat() * 80.0f;
+
+        // Invert colors in this region
+        g.setColour(juce::Colours::white.withAlpha(0.8f));
+        g.fillRect(x, y, w, h);
+    }
+
     // Data corruption blocks
-    for (int i = 0; i < 3; ++i)
+    for (int i = 0; i < 8; ++i)
     {
         float x = random.nextFloat() * bounds.getWidth();
         float y = random.nextFloat() * bounds.getHeight();
         float w = 10.0f + random.nextFloat() * 50.0f;
         float h = 10.0f + random.nextFloat() * 30.0f;
 
-        g.setColour(random.nextBool() ? juce::Colour(0x00FF00) : juce::Colours::black);
+        g.setColour(random.nextBool() ? juce::Colours::white : juce::Colours::black);
         g.fillRect(x, y, w, h);
 
         // Add some ASCII noise
-        g.setColour(juce::Colour(0x00FF00));
+        g.setColour(juce::Colours::white);
         g.setFont(juce::Font(juce::Font::getDefaultMonospacedFontName(), 10.0f, juce::Font::plain));
 
         for (int j = 0; j < 5; ++j)
@@ -206,7 +230,7 @@ void CRTShaderOverlay::drawStaticNoise(juce::Graphics& g)
         float y = random.nextFloat() * bounds.getHeight();
         float brightness = random.nextFloat();
 
-        g.setColour(juce::Colour(0x00FF00).withAlpha(brightness * 0.05f));
+        g.setColour(juce::Colours::white.withAlpha(brightness * 0.1f));
         g.fillRect(x, y, 1.0f, 1.0f);
     }
 }
@@ -232,7 +256,7 @@ void CRTShaderOverlay::timerCallback()
     }
 
     // Occasional random glitch
-    if (random.nextFloat() < 0.001f) // 0.1% chance per frame
+    if (random.nextFloat() < 0.005f) // 0.5% chance per frame
     {
         triggerGlitch();
     }

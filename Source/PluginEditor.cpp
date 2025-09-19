@@ -93,12 +93,12 @@ SpreadsheetsSynthEditor::SpreadsheetsSynthEditor (SpreadsheetsSynthProcessor& p)
     addAndMakeVisible(tempoLabel);
 
     statusLabel.setText("[STATUS:STOPPED]", juce::dontSendNotification);
-    statusLabel.setColour(juce::Label::textColourId, juce::Colour(0x00FF00));
+    statusLabel.setColour(juce::Label::textColourId, juce::Colours::white);
     statusLabel.setFont(juce::Font(juce::Font::getDefaultMonospacedFontName(), 12.0f, juce::Font::plain));
     addAndMakeVisible(statusLabel);
 
     debugLabel.setText("[STEP:00/16]", juce::dontSendNotification);
-    debugLabel.setColour(juce::Label::textColourId, juce::Colour(0x00FF00).withAlpha(0.7f));
+    debugLabel.setColour(juce::Label::textColourId, juce::Colours::white.withAlpha(0.7f));
     debugLabel.setFont(juce::Font(juce::Font::getDefaultMonospacedFontName(), 12.0f, juce::Font::plain));
     addAndMakeVisible(debugLabel);
 
@@ -164,8 +164,8 @@ void SpreadsheetsSynthEditor::paint (juce::Graphics& g)
     // Black background
     g.fillAll(juce::Colours::black);
 
-    // Terminal green text with monospace font
-    g.setColour(juce::Colour(0x00FF00));
+    // Terminal white text with monospace font
+    g.setColour(juce::Colours::white);
     g.setFont(juce::Font(juce::Font::getDefaultMonospacedFontName(), 10.0f, juce::Font::plain));
 
     // Parameter labels in terminal style
@@ -188,7 +188,7 @@ void SpreadsheetsSynthEditor::paint (juce::Graphics& g)
     g.drawText("[MASTER]", 710, 90, 80, 20, juce::Justification::centred);
 
     // ASCII box drawing for sections
-    g.setColour(juce::Colour(0x00FF00).withAlpha(0.5f));
+    g.setColour(juce::Colours::white.withAlpha(0.5f));
 
     // Draw section dividers with ASCII characters
     for (int x = 0; x < getWidth(); x += 8)
@@ -199,7 +199,7 @@ void SpreadsheetsSynthEditor::paint (juce::Graphics& g)
     }
 
     // Section labels
-    g.setColour(juce::Colour(0x00FF00).withAlpha(0.8f));
+    g.setColour(juce::Colours::white.withAlpha(0.8f));
     g.drawText(">SYNTH_PARAMS", 10, 195, 150, 15, juce::Justification::left);
     g.drawText(">SEQ_MATRIX", 10, 365, 150, 15, juce::Justification::left);
     g.drawText(">COMB_FILTER", 10, 510, 100, 20, juce::Justification::left);
@@ -273,14 +273,14 @@ void SpreadsheetsSynthEditor::timerCallback()
     // Update status display
     bool isPlaying = audioProcessor.getSequencer().isPlaying();
     statusLabel.setText(isPlaying ? "[STATUS:PLAYING]" : "[STATUS:STOPPED]", juce::dontSendNotification);
-    statusLabel.setColour(juce::Label::textColourId, juce::Colour(0x00FF00).withAlpha(isPlaying ? 1.0f : 0.6f));
+    statusLabel.setColour(juce::Label::textColourId, juce::Colours::white.withAlpha(isPlaying ? 1.0f : 0.6f));
 
     // Update button appearance
     playButton.setColour(juce::TextButton::buttonColourId,
-                        isPlaying ? juce::Colour(0x00FF00).withAlpha(0.3f) : juce::Colours::black);
-    playButton.setColour(juce::TextButton::buttonOnColourId, juce::Colour(0x00FF00).withAlpha(0.5f));
-    playButton.setColour(juce::TextButton::textColourOnId, juce::Colour(0x00FF00));
-    playButton.setColour(juce::TextButton::textColourOffId, juce::Colour(0x00FF00));
+                        isPlaying ? juce::Colours::white.withAlpha(0.3f) : juce::Colours::black);
+    playButton.setColour(juce::TextButton::buttonOnColourId, juce::Colours::white.withAlpha(0.5f));
+    playButton.setColour(juce::TextButton::textColourOnId, juce::Colours::white);
+    playButton.setColour(juce::TextButton::textColourOffId, juce::Colours::white);
 
     // Update step display
     int currentStep = audioProcessor.getSequencer().getCurrentStep();

@@ -28,7 +28,7 @@ void SpreadsheetsDisplay::paint(juce::Graphics& g)
     float letterWidth = getWidth() / static_cast<float>(numLetters);
 
     // Draw ASCII border
-    g.setColour(juce::Colour(0x00FF00).withAlpha(0.7f));
+    g.setColour(juce::Colours::white.withAlpha(0.7f));
     g.setFont(juce::Font(juce::Font::getDefaultMonospacedFontName(), 12.0f, juce::Font::plain));
 
     // Top border
@@ -53,9 +53,9 @@ void SpreadsheetsDisplay::paint(juce::Graphics& g)
     {
         auto& state = letterStates[i];
 
-        // Terminal green color only
+        // Terminal white color only
         float alpha = 0.3f + (state.brightness * 0.7f);
-        juce::Colour letterColor = juce::Colour(0x00FF00).withAlpha(alpha);
+        juce::Colour letterColor = juce::Colours::white.withAlpha(alpha);
 
         // Phosphor glow effect
         if (state.brightness > 0.5f)
@@ -66,7 +66,7 @@ void SpreadsheetsDisplay::paint(juce::Graphics& g)
             for (int layer = 3; layer > 0; --layer)
             {
                 float layerAlpha = (state.brightness * 0.1f) / layer;
-                g.setColour(juce::Colour(0x00FF00).withAlpha(layerAlpha));
+                g.setColour(juce::Colours::white.withAlpha(layerAlpha));
 
                 auto bounds = juce::Rectangle<float>(
                     i * letterWidth - (glowSize * layer),
@@ -85,7 +85,7 @@ void SpreadsheetsDisplay::paint(juce::Graphics& g)
                 {
                     float x = (i * letterWidth) + random.nextFloat() * letterWidth;
                     float y = getHeight() * 0.25f + random.nextFloat() * getHeight() * 0.5f;
-                    g.setColour(juce::Colour(0x00FF00).withAlpha(random.nextFloat() * 0.3f));
+                    g.setColour(juce::Colours::white.withAlpha(random.nextFloat() * 0.5f));
                     g.fillRect(x, y, 2.0f, 2.0f);
                 }
             }
@@ -114,7 +114,7 @@ void SpreadsheetsDisplay::paint(juce::Graphics& g)
     }
 
     // Data readout at bottom
-    g.setColour(juce::Colour(0x00FF00).withAlpha(0.5f));
+    g.setColour(juce::Colours::white.withAlpha(0.5f));
     g.setFont(juce::Font(juce::Font::getDefaultMonospacedFontName(), 10.0f, juce::Font::plain));
     juce::String dataString = "[ACTIVE] ";
     for (int i = 0; i < numLetters; ++i)

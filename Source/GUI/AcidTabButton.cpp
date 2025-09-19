@@ -25,7 +25,7 @@ void AcidTabButton::paint(juce::Graphics& g)
     g.fillAll(juce::Colours::black);
 
     // Draw terminal border
-    g.setColour(juce::Colour(0x00FF00).withAlpha(0.7f));
+    g.setColour(juce::Colours::white.withAlpha(0.7f));
     g.drawRect(bounds, 1.0f);
 
     // Data corruption background pattern
@@ -34,21 +34,30 @@ void AcidTabButton::paint(juce::Graphics& g)
     // Draw glitch blocks
     if (isHovered || glitchActive)
     {
-        for (int i = 0; i < 5; ++i)
+        for (int i = 0; i < 15; ++i)
         {
             float x = bounds.getX() + random.nextFloat() * bounds.getWidth();
             float y = bounds.getY() + random.nextFloat() * bounds.getHeight();
-            float w = 5.0f + random.nextFloat() * 20.0f;
-            float h = 2.0f + random.nextFloat() * 10.0f;
+            float w = 5.0f + random.nextFloat() * 40.0f;
+            float h = 2.0f + random.nextFloat() * 20.0f;
 
-            g.setColour(juce::Colour(0x00FF00).withAlpha(random.nextFloat() * 0.5f));
+            g.setColour(random.nextBool() ? juce::Colours::white.withAlpha(random.nextFloat())
+                                         : juce::Colours::black);
             g.fillRect(x, y, w, h);
+
+            // Add inverted blocks
+            if (random.nextFloat() < 0.3f)
+            {
+                // Create inverted appearance by drawing white overlay
+                g.setColour(juce::Colours::white.withAlpha(0.8f));
+                g.fillRect(x, y, w, h);
+            }
         }
     }
 
     // Draw binary/hex data stream
     g.setFont(juce::Font(juce::Font::getDefaultMonospacedFontName(), 8.0f, juce::Font::plain));
-    g.setColour(juce::Colour(0x00FF00).withAlpha(0.4f));
+    g.setColour(juce::Colours::white.withAlpha(0.4f));
 
     for (int row = 0; row < 6; ++row)
     {
@@ -64,7 +73,7 @@ void AcidTabButton::paint(juce::Graphics& g)
 
     // Central command prompt cursor
     auto center = bounds.getCentre();
-    g.setColour(juce::Colour(0x00FF00));
+    g.setColour(juce::Colours::white);
     g.setFont(juce::Font(juce::Font::getDefaultMonospacedFontName(), 20.0f, juce::Font::plain));
 
     // Blinking cursor effect
@@ -90,7 +99,7 @@ void AcidTabButton::paint(juce::Graphics& g)
 
     // Status indicator
     g.setFont(juce::Font(juce::Font::getDefaultMonospacedFontName(), 7.0f, juce::Font::plain));
-    g.setColour(juce::Colour(0x00FF00).withAlpha(0.6f));
+    g.setColour(juce::Colours::white.withAlpha(0.6f));
     g.drawText(isHovered ? ">>EXEC READY" : ">>STANDBY",
                bounds.getX() + 2, bounds.getBottom() - 12,
                bounds.getWidth() - 4, 10, juce::Justification::left);
@@ -106,7 +115,7 @@ void AcidTabButton::paint(juce::Graphics& g)
     // Press effect
     if (isPressed)
     {
-        g.setColour(juce::Colour(0x00FF00).withAlpha(0.3f));
+        g.setColour(juce::Colours::white.withAlpha(0.3f));
         g.fillRect(bounds);
 
         // Trigger more intense glitch
@@ -118,7 +127,7 @@ void AcidTabButton::drawDataCorruption(juce::Graphics& g, juce::Rectangle<float>
 {
     // ASCII art pattern
     g.setFont(juce::Font(juce::Font::getDefaultMonospacedFontName(), 6.0f, juce::Font::plain));
-    g.setColour(juce::Colour(0x00FF00).withAlpha(0.15f));
+    g.setColour(juce::Colours::white.withAlpha(0.15f));
 
     juce::String patterns[4] = { "▓", "▒", "░", "█" };
 

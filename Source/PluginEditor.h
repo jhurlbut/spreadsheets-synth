@@ -28,14 +28,14 @@ public:
         // Black background
         g.fillAll(juce::Colours::black);
 
-        // Terminal green color scheme
+        // Terminal white color scheme
         float brightness = 0.3f;
         if (isActive) brightness = hasAccent ? 1.0f : 0.8f;
 
-        juce::Colour terminalGreen = juce::Colour(0x00FF00).withAlpha(brightness);
+        juce::Colour terminalWhite = juce::Colours::white.withAlpha(brightness);
 
         // Draw border with ASCII characters
-        g.setColour(terminalGreen);
+        g.setColour(terminalWhite);
         g.setFont(juce::Font(juce::Font::getDefaultMonospacedFontName(), 10.0f, juce::Font::plain));
 
         // Determine ASCII representation based on state
@@ -54,7 +54,7 @@ public:
 
         // Show step number
         g.setFont(juce::Font(juce::Font::getDefaultMonospacedFontName(), 8.0f, juce::Font::plain));
-        g.setColour(terminalGreen.withAlpha(0.5f));
+        g.setColour(terminalWhite.withAlpha(0.5f));
         juce::String stepHex = juce::String::toHexString(stepNum + 1).paddedLeft('0', 2);
         g.drawText(stepHex, bounds.reduced(2), juce::Justification::topRight);
 
@@ -66,11 +66,11 @@ public:
             flashCounter++;
             if ((flashCounter / 15) % 2 == 0)
             {
-                g.setColour(juce::Colour(0x00FF00));
+                g.setColour(juce::Colours::white);
                 g.drawRect(bounds.reduced(1), 2.0f);
 
                 // Add glow effect
-                g.setColour(juce::Colour(0x00FF00).withAlpha(0.3f));
+                g.setColour(juce::Colours::white.withAlpha(0.3f));
                 g.drawRect(bounds, 3.0f);
             }
         }

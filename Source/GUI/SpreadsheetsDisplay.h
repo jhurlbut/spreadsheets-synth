@@ -27,7 +27,7 @@ private:
     struct LetterState
     {
         float brightness = 0.0f;
-        juce::Colour currentColor = juce::Colour(0x00FF00);
+        juce::Colour currentColor = juce::Colours::white;
     };
 
     std::array<LetterState, numLetters> letterStates;

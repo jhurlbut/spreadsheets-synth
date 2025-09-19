@@ -1,6 +1,8 @@
 # PLUGIN
 A cultural product of the band Spreadsheets
 
+![Spreadsheets Synth Demo](spreadsheets_synth_demo.gif)
+
 ## TRANSMISSION
 
 SPREADSHEETS speaks through the midnight frequency. echoes in the data stream.
@@ -33,7 +35,17 @@ Z: TIMELINE UNDEFINED
 
 "In the beginning there was Jack, and Jack had a spreadsheet..."
 
-## BUILD SEQUENCE
+## DOWNLOAD [DIRECT FREQUENCY]
+
+### Pre-compiled transmissions available at:
+- [Latest Release](https://github.com/spreadsheetsmusic/spreadsheets-synth/releases/latest)
+- VST3 (Universal): `SpreadsheetsSynth_VST3_v1.0.0.zip`
+- AU (macOS 808): `SpreadsheetsSynth_AU_v1.0.0.zip`
+- Standalone (Direct Jack): `SpreadsheetsSynth_Standalone_macOS_v1.0.0.zip`
+
+Installation coordinates: See [INSTALL_313.md](INSTALL_313.md)
+
+## BUILD SEQUENCE [FROM SOURCE]
 
 ```bash
 git clone [REDACTED]/spreadsheets-synth.git
@@ -55,4 +67,4 @@ CONNECT
 📡 https://www.instagram.com/spreadsheets_band/
 
 ---
-"Somewhere in California, a group of friends decided to form a band. They called themselves Spreadsheets, and they made music that sounded like the future had already happened." - The Wire Magazine
+"Somewhere in California, a group of friends decided to form a band. They called themselves Spreadsheets, and they made music that sounded like the future had already happened."

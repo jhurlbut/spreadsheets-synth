@@ -16,12 +16,12 @@ void XYPad::paint(juce::Graphics& g)
     // Black background
     g.fillAll(juce::Colours::black);
 
-    // Terminal green border
-    g.setColour(juce::Colour(0x00FF00).withAlpha(0.7f));
+    // Terminal white border
+    g.setColour(juce::Colours::white.withAlpha(0.7f));
     g.drawRect(bounds, 1.0f);
 
     // Grid lines - dot matrix style
-    g.setColour(juce::Colour(0x00FF00).withAlpha(0.2f));
+    g.setColour(juce::Colours::white.withAlpha(0.2f));
 
     // Dot grid pattern
     for (int x = 10; x < bounds.getWidth(); x += 20)
@@ -33,7 +33,7 @@ void XYPad::paint(juce::Graphics& g)
     }
 
     // Major grid lines
-    g.setColour(juce::Colour(0x00FF00).withAlpha(0.3f));
+    g.setColour(juce::Colours::white.withAlpha(0.3f));
     for (int i = 1; i < 4; ++i)
     {
         float x = bounds.getWidth() * (i / 4.0f);
@@ -44,7 +44,7 @@ void XYPad::paint(juce::Graphics& g)
     }
 
     // Center crosshair - terminal style
-    g.setColour(juce::Colour(0x00FF00).withAlpha(0.5f));
+    g.setColour(juce::Colours::white.withAlpha(0.5f));
     g.setFont(juce::Font(juce::Font::getDefaultMonospacedFontName(), 16.0f, juce::Font::plain));
 
     // Draw crosshair with ASCII characters
@@ -72,7 +72,7 @@ void XYPad::paint(juce::Graphics& g)
     auto thumbPos = getThumbPosition();
 
     // Tracking lines to thumb
-    g.setColour(juce::Colour(0x00FF00).withAlpha(0.4f));
+    g.setColour(juce::Colours::white.withAlpha(0.4f));
 
     // Vertical tracking line
     for (float y = 0; y < bounds.getHeight(); y += 4)
@@ -87,18 +87,18 @@ void XYPad::paint(juce::Graphics& g)
     }
 
     // Thumb cursor - terminal block style
-    g.setColour(juce::Colour(0x00FF00));
+    g.setColour(juce::Colours::white);
     g.setFont(juce::Font(juce::Font::getDefaultMonospacedFontName(), 14.0f, juce::Font::plain));
     g.drawText("█", thumbPos.x - 7, thumbPos.y - 7, 14, 14, juce::Justification::centred);
 
     // Glow effect around thumb
-    g.setColour(juce::Colour(0x00FF00).withAlpha(0.3f));
+    g.setColour(juce::Colours::white.withAlpha(0.3f));
     g.drawRect(thumbPos.x - 8.0f, thumbPos.y - 8.0f, 16.0f, 16.0f, 2.0f);
-    g.setColour(juce::Colour(0x00FF00).withAlpha(0.1f));
+    g.setColour(juce::Colours::white.withAlpha(0.1f));
     g.drawRect(thumbPos.x - 12.0f, thumbPos.y - 12.0f, 24.0f, 24.0f, 1.0f);
 
     // Coordinate display - terminal style
-    g.setColour(juce::Colour(0x00FF00).withAlpha(0.8f));
+    g.setColour(juce::Colours::white.withAlpha(0.8f));
     g.setFont(juce::Font(juce::Font::getDefaultMonospacedFontName(), 10.0f, juce::Font::plain));
 
     // Display coordinates as ASCII
@@ -106,7 +106,7 @@ void XYPad::paint(juce::Graphics& g)
     g.drawText(coordText, bounds.reduced(5), juce::Justification::topRight);
 
     // Labels with terminal prompt style
-    g.setColour(juce::Colour(0x00FF00).withAlpha(0.6f));
+    g.setColour(juce::Colours::white.withAlpha(0.6f));
     g.drawText(">DELAY_T", 5, bounds.getBottom() - 15, 60, 15, juce::Justification::left);
     g.drawText(">FEEDBK", 5, 5, 60, 15, juce::Justification::left);
 
