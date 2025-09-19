@@ -1,0 +1,31 @@
+# Build directories
+build/
+builds/
+*.build/
+
+# OS files
+.DS_Store
+Thumbs.db
+*.swp
+*~
+
+# IDE files
+.vscode/
+*.xcodeproj
+*.xcworkspace
+*.xcuserdata
+.idea/
+
+# Compiled files
+*.o
+*.a
+*.dylib
+*.so
+*.dll
+*.exe
+
+# Audio plugin builds
+*.vst3
+*.component
+*.vst
+*.app
