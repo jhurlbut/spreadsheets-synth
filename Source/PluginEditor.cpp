@@ -41,6 +41,12 @@ SpreadsheetsSynthEditor::SpreadsheetsSynthEditor (SpreadsheetsSynthProcessor& p)
     };
     // XY pad controls harmonic saturation (X) and subharmonic depth (Y)
     addAndMakeVisible(combFilterPad);
+    
+    // Set initial XY pad values from parameters
+    if (auto* xParam = audioProcessor.getAPVTS().getRawParameterValue("harmonicAmount"))
+        combFilterPad.setXValue(xParam->load());
+    if (auto* yParam = audioProcessor.getAPVTS().getRawParameterValue("subharmonicDepth"))
+        combFilterPad.setYValue(yParam->load());
 
     setupSlider(masterVolumeKnob, "masterVolume");
 
@@ -284,11 +290,11 @@ void SpreadsheetsSynthEditor::timerCallback()
                         juce::String(audioProcessor.getSequencer().getTempo(), 1) + " BPM",
                         juce::dontSendNotification);
 
-    // Update XY pad from parameters
-    auto xValue = audioProcessor.getAPVTS().getRawParameterValue("combFilterX")->load();
-    auto yValue = audioProcessor.getAPVTS().getRawParameterValue("combFilterY")->load();
-    combFilterPad.setXValue(xValue);
-    combFilterPad.setYValue(yValue);
+    // Update XY pad from harmonic parameters
+    if (auto* xParam = audioProcessor.getAPVTS().getRawParameterValue("harmonicAmount"))
+        combFilterPad.setXValue(xParam->load());
+    if (auto* yParam = audioProcessor.getAPVTS().getRawParameterValue("subharmonicDepth"))
+        combFilterPad.setYValue(yParam->load());
 }
 
 void SpreadsheetsSynthEditor::updateStepButtons()
