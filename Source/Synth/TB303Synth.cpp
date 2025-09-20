@@ -45,8 +45,12 @@ void TB303Synth::updateParameters(juce::AudioProcessorValueTreeState& apvts)
     float overdrive = apvts.getRawParameterValue("overdrive")->load();
     int waveform = apvts.getRawParameterValue("waveform")->load();
 
+    float harmonicAmount = apvts.getRawParameterValue("harmonicAmount")->load();
+    float subharmonicDepth = apvts.getRawParameterValue("subharmonicDepth")->load();
+
     for (auto* voice : voices)
     {
         voice->updateParameters(cutoff, resonance, decay, accent, overdrive, waveform);
+        voice->updateHarmonicParameters(harmonicAmount, subharmonicDepth);
     }
 }

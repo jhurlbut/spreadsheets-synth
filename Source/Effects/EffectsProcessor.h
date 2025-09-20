@@ -32,21 +32,11 @@ private:
     int delayBufferSize { 0 };
     int delayWritePosition { 0 };
 
-    // Comb filter arrays for 4 parallel comb filters
-    static constexpr int numCombFilters = 4;
-    std::array<std::vector<float>, numCombFilters> combBuffers;
-    std::array<int, numCombFilters> combBufferSizes;
-    std::array<int, numCombFilters> combWritePositions;
-    std::array<float, numCombFilters> combFeedback;
-
-    float combFilterX { 0.5f };
-    float combFilterY { 0.5f };
-    float combFilterMix { 0.3f };
+    // Comb filter removed - harmonics processor now in TB303Voice
 
     juce::AudioBuffer<float> dryBuffer;
 
     void processDelay(juce::AudioBuffer<float>& buffer);
-    void processCombFilter(juce::AudioBuffer<float>& buffer);
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(EffectsProcessor)
 };

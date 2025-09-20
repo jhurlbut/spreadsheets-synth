@@ -2,6 +2,38 @@
 
 #include <JuceHeader.h>
 
+// Harmonic processor for adding overtones and undertones
+class HarmonicProcessor
+{
+public:
+    HarmonicProcessor();
+
+    void prepare(double sampleRate, int samplesPerBlock);
+    float process(float input, float frequency);
+    void updateParameters(float harmonicAmount, float subharmonicDepth);
+    void reset();
+
+private:
+    double sampleRate { 44100.0 };
+
+    // Parameters from XY pad
+    float harmonicAmount { 0.15f };   // X-axis: overtone saturation
+    float subharmonicDepth { 0.1f };  // Y-axis: undertone depth
+
+    // Subharmonic generation
+    float subPhase { 0.0f };
+    float subPhase2 { 0.0f };
+    float lastSample { 0.0f };
+    int zeroCrossingCounter { 0 };
+
+    // Oversampling for anti-aliasing
+    std::unique_ptr<dsp::Oversampling<float>> oversampler;
+
+    // Waveshaping functions
+    float asymmetricTanh(float x, float drive, float asymmetry);
+    float chebyshevMix(float x, float amount);
+};
+
 class TB303Voice : public juce::SynthesiserVoice
 {
 public:
@@ -26,11 +58,14 @@ public:
     void updateParameters (float cutoff, float resonance, float decay,
                            float accent, float overdrive, int waveform);
 
+    void updateHarmonicParameters(float harmonicAmount, float subharmonicDepth);
+
 private:
     enum class Waveform { Sawtooth, Square };
 
     dsp::Oscillator<float> oscillator;
     dsp::LadderFilter<float> filter;
+    HarmonicProcessor harmonicProcessor;
 
     juce::ADSR envelope;
     juce::ADSR filterEnvelope;
@@ -50,5 +85,14 @@ private:
 
     double sampleRate { 44100.0 };
 
+    // PolyBLEP for anti-aliased square wave
+    float polyBLEPPhase { 0.0f };
+    float lastPhase { 0.0f };
+    float generatePolyBLEPSquare(float frequency);
+    float polyBLEP(float phase, float phaseInc);
+
     void updateOscillator();
+
+    // Amplitude compensation for square wave
+    static constexpr float squareWaveBoost { 1.4f };
 };

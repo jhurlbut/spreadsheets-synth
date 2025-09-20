@@ -30,21 +30,17 @@ SpreadsheetsSynthEditor::SpreadsheetsSynthEditor (SpreadsheetsSynthProcessor& p)
     setupSlider(phaserFeedbackKnob, "phaserFeedback");
     setupSlider(phaserMixKnob, "phaserMix");
 
-    // Setup comb filter XY pad
+    // Setup harmonic XY pad
     combFilterPad.onValueChange = [this](float x, float y)
     {
-        auto* xParam = audioProcessor.getAPVTS().getParameter("combFilterX");
-        auto* yParam = audioProcessor.getAPVTS().getParameter("combFilterY");
+        auto* xParam = audioProcessor.getAPVTS().getParameter("harmonicAmount");
+        auto* yParam = audioProcessor.getAPVTS().getParameter("subharmonicDepth");
 
         if (xParam) xParam->setValueNotifyingHost(xParam->convertTo0to1(x));
         if (yParam) yParam->setValueNotifyingHost(yParam->convertTo0to1(y));
     };
-    // combFilterPad.setTooltip("X: Delay scaling | Y: Feedback amount - Creates metallic textures");
+    // XY pad controls harmonic saturation (X) and subharmonic depth (Y)
     addAndMakeVisible(combFilterPad);
-
-    setupSlider(combFilterMixKnob, "combFilterMix");
-    combFilterMixKnob.setSliderStyle(juce::Slider::RotaryVerticalDrag);
-    combFilterMixKnob.setTextBoxStyle(juce::Slider::TextBoxBelow, false, 60, 20);
 
     setupSlider(masterVolumeKnob, "masterVolume");
 
@@ -260,7 +256,7 @@ void SpreadsheetsSynthEditor::resized()
     phaserMixKnob.setBounds(670, 410, 80, 80);
 
     combFilterPad.setBounds(10, 535, 150, 150);
-    combFilterMixKnob.setBounds(180, 590, 80, 80);
+    // Comb filter mix knob removed - harmonics controlled by XY pad
 
     // CRT overlay covers entire window
     crtOverlay.setBounds(getLocalBounds());

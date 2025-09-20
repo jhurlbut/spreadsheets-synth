@@ -134,9 +134,7 @@ private:
     juce::Slider phaserFeedbackKnob;
     juce::Slider phaserMixKnob;
 
-    XYPad combFilterPad;
-    juce::Slider combFilterMixKnob;
-    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> combFilterMixAttachment;
+    XYPad combFilterPad;  // Now controls harmonics/subharmonics
 
     juce::Slider masterVolumeKnob;
 

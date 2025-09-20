@@ -107,8 +107,8 @@ void XYPad::paint(juce::Graphics& g)
 
     // Labels with terminal prompt style
     g.setColour(juce::Colours::white.withAlpha(0.6f));
-    g.drawText(">DELAY_T", 5, bounds.getBottom() - 15, 60, 15, juce::Justification::left);
-    g.drawText(">FEEDBK", 5, 5, 60, 15, juce::Justification::left);
+    g.drawText(">HARMONIC", 5, bounds.getBottom() - 15, 70, 15, juce::Justification::left);
+    g.drawText(">SUBHRMNC", 5, 5, 70, 15, juce::Justification::left);
 
     // Add data readout at bottom
     g.setFont(juce::Font(juce::Font::getDefaultMonospacedFontName(), 8.0f, juce::Font::plain));

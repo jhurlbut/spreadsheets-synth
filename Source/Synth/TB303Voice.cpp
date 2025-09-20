@@ -1,5 +1,107 @@
 #include "TB303Voice.h"
 
+// HarmonicProcessor Implementation
+HarmonicProcessor::HarmonicProcessor()
+{
+    oversampler = std::make_unique<dsp::Oversampling<float>>(1, 2,
+        dsp::Oversampling<float>::filterHalfBandPolyphaseIIR);
+}
+
+void HarmonicProcessor::prepare(double sr, int samplesPerBlock)
+{
+    sampleRate = sr;
+    oversampler->initProcessing(samplesPerBlock);
+    reset();
+}
+
+void HarmonicProcessor::reset()
+{
+    subPhase = 0.0f;
+    subPhase2 = 0.0f;
+    lastSample = 0.0f;
+    zeroCrossingCounter = 0;
+    oversampler->reset();
+}
+
+void HarmonicProcessor::updateParameters(float harmAmount, float subDepth)
+{
+    harmonicAmount = harmAmount;
+    subharmonicDepth = subDepth;
+}
+
+float HarmonicProcessor::asymmetricTanh(float x, float drive, float asymmetry)
+{
+    float dc = asymmetry * std::abs(x) * 0.5f;
+    float shaped = std::tanh((x + dc) * drive);
+    return shaped - dc * 0.5f;
+}
+
+float HarmonicProcessor::chebyshevMix(float x, float amount)
+{
+    x = juce::jlimit(-1.0f, 1.0f, x);
+    float T2 = 2.0f * x * x - 1.0f;  // 2nd harmonic
+    float T3 = 4.0f * x * x * x - 3.0f * x;  // 3rd harmonic
+    return x + (T2 * amount * 0.05f) + (T3 * amount * 0.03f);
+}
+
+float HarmonicProcessor::process(float input, float frequency)
+{
+    float output = input;
+
+    // A. Generate subharmonics (Y-axis control)
+    if (subharmonicDepth > 0.01f)
+    {
+        // Sub-octave (f/2)
+        subPhase += (frequency * 0.5f * 2.0f * juce::MathConstants<float>::pi) / sampleRate;
+        if (subPhase > juce::MathConstants<float>::twoPi)
+            subPhase -= juce::MathConstants<float>::twoPi;
+        float sub1 = std::sin(subPhase) * subharmonicDepth * 0.3f;
+
+        // Sub-sub-octave (f/4)
+        subPhase2 += (frequency * 0.25f * 2.0f * juce::MathConstants<float>::pi) / sampleRate;
+        if (subPhase2 > juce::MathConstants<float>::twoPi)
+            subPhase2 -= juce::MathConstants<float>::twoPi;
+        float sub2 = std::sin(subPhase2) * subharmonicDepth * 0.15f;
+
+        output += sub1 + sub2;
+    }
+
+    // B. Apply waveshaping for overtones (X-axis control)
+    if (harmonicAmount > 0.01f)
+    {
+        // Create a single-sample audio block for oversampling
+        float* data = &output;
+        dsp::AudioBlock<float> block(&data, 1, 1);
+        auto oversampledBlock = oversampler->processSamplesUp(block);
+
+        float* oversampledData = oversampledBlock.getChannelPointer(0);
+        for (size_t i = 0; i < oversampledBlock.getNumSamples(); ++i)
+        {
+            float sample = oversampledData[i];
+
+            // Asymmetric tanh for even/odd harmonics
+            float drive = 1.0f + harmonicAmount * 3.0f;
+            float asymmetry = harmonicAmount * 0.2f;
+            float shaped = asymmetricTanh(sample, drive, asymmetry);
+
+            // Add Chebyshev harmonics
+            shaped = chebyshevMix(shaped, harmonicAmount);
+
+            oversampledData[i] = shaped;
+        }
+
+        oversampler->processSamplesDown(block);
+        output = *data;
+
+        // Mix dry/wet (subtle effect)
+        output = input * (1.0f - harmonicAmount * 0.3f) + output * harmonicAmount * 0.3f;
+    }
+
+    lastSample = output;
+    return output;
+}
+
+// TB303Voice Implementation
 TB303Voice::TB303Voice()
 {
     oscillator.initialise([](float x) { return std::sin(x); });
@@ -24,11 +126,15 @@ void TB303Voice::prepareToPlay(double sr, int samplesPerBlock)
 
     oscillator.prepare(spec);
     filter.prepare(spec);
+    harmonicProcessor.prepare(sampleRate, samplesPerBlock);
 
     envelope.setSampleRate(sampleRate);
     filterEnvelope.setSampleRate(sampleRate);
 
     filter.setMode(dsp::LadderFilterMode::LPF24);
+
+    polyBLEPPhase = 0.0f;
+    lastPhase = 0.0f;
 }
 
 void TB303Voice::updateParameters(float cutoff, float resonance, float decay,
@@ -56,13 +162,53 @@ void TB303Voice::updateOscillator()
             return (2.0f * x / juce::MathConstants<float>::twoPi) - 1.0f;
         });
     }
-    else
+    // Square wave now uses PolyBLEP, so we don't need to reinitialize here
+}
+
+void TB303Voice::updateHarmonicParameters(float harmonicAmount, float subharmonicDepth)
+{
+    harmonicProcessor.updateParameters(harmonicAmount, subharmonicDepth);
+}
+
+float TB303Voice::polyBLEP(float phase, float phaseInc)
+{
+    float dt = phaseInc / juce::MathConstants<float>::twoPi;
+
+    // Handle discontinuity at phase = 0
+    if (phase < phaseInc)
     {
-        oscillator.initialise([](float x)
-        {
-            return x < juce::MathConstants<float>::pi ? 1.0f : -1.0f;
-        });
+        float t = phase / phaseInc;
+        return 2.0f * t - t * t - 1.0f;
     }
+    // Handle discontinuity at phase = π
+    else if (phase > juce::MathConstants<float>::pi &&
+             lastPhase <= juce::MathConstants<float>::pi)
+    {
+        float t = (phase - juce::MathConstants<float>::pi) / phaseInc;
+        return -(2.0f * t - t * t - 1.0f);
+    }
+
+    return 0.0f;
+}
+
+float TB303Voice::generatePolyBLEPSquare(float frequency)
+{
+    float phaseInc = (frequency * juce::MathConstants<float>::twoPi) / sampleRate;
+
+    polyBLEPPhase += phaseInc;
+    if (polyBLEPPhase >= juce::MathConstants<float>::twoPi)
+        polyBLEPPhase -= juce::MathConstants<float>::twoPi;
+
+    // Generate basic square wave
+    float value = polyBLEPPhase < juce::MathConstants<float>::pi ? 1.0f : -1.0f;
+
+    // Add PolyBLEP correction at discontinuities
+    value += polyBLEP(polyBLEPPhase, phaseInc);
+
+    lastPhase = polyBLEPPhase;
+
+    // Apply amplitude boost for square wave
+    return value * squareWaveBoost;
 }
 
 
@@ -75,6 +221,12 @@ void TB303Voice::startNote(int midiNoteNumber, float velocity,
     {
         currentFrequency = targetFrequency;
         oscillator.setFrequency(currentFrequency);
+        // Reset PolyBLEP phase for square wave
+        if (currentWaveform == Waveform::Square)
+        {
+            polyBLEPPhase = 0.0f;
+            lastPhase = 0.0f;
+        }
     }
     else
     {
@@ -132,7 +284,19 @@ void TB303Voice::renderNextBlock(juce::AudioBuffer<float>& outputBuffer,
             oscillator.setFrequency(currentFrequency);
         }
 
-        float oscSample = oscillator.processSample(0.0f);
+        // Generate oscillator sample (with PolyBLEP for square)
+        float oscSample;
+        if (currentWaveform == Waveform::Square)
+        {
+            oscSample = generatePolyBLEPSquare(currentFrequency);
+        }
+        else
+        {
+            oscSample = oscillator.processSample(0.0f);
+        }
+
+        // Apply harmonic processing to add overtones/undertones
+        oscSample = harmonicProcessor.process(oscSample, currentFrequency);
 
         float envValue = envelope.getNextSample();
         float filterEnvValue = filterEnvelope.getNextSample();
