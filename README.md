@@ -38,17 +38,17 @@ Z: TIMELINE UNDEFINED
 ## DOWNLOAD [DIRECT FREQUENCY]
 
 ### Pre-compiled transmissions available at:
-- [Latest Release](https://github.com/spreadsheetsmusic/spreadsheets-synth/releases/latest)
-- VST3 (Universal): `SpreadsheetsSynth_VST3_v1.0.0.zip`
-- AU (macOS 808): `SpreadsheetsSynth_AU_v1.0.0.zip`
-- Standalone (Direct Jack): `SpreadsheetsSynth_Standalone_macOS_v1.0.0.zip`
+- [Latest Release v1.1.0 - LF0.M0DUL4T10N](https://github.com/jhurlbut/spreadsheets-synth/releases/tag/v1.1.0)
+- VST3 (Universal): `SpreadsheetsSynth_VST3_v1.1.0.zip`
+- AU (macOS 808): `SpreadsheetsSynth_AU_v1.1.0.zip`
+- Standalone (Direct Jack): `SpreadsheetsSynth_Standalone_macOS_v1.1.0.zip`
 
 Installation coordinates: See [INSTALL_313.md](INSTALL_313.md)
 
 ## BUILD SEQUENCE [FROM SOURCE]
 
 ```bash
-git clone [REDACTED]/spreadsheets-synth.git
+git clone https://github.com/jhurlbut/spreadsheets-synth.git
 cd spreadsheets-synth
 git clone https://github.com/juce-framework/JUCE.git
 mkdir build && cd build
