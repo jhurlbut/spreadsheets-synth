@@ -63,11 +63,11 @@ juce::AudioProcessorValueTreeState::ParameterLayout SpreadsheetsSynthProcessor::
     params.push_back(std::make_unique<juce::AudioParameterFloat>("phaserMix", "Phaser Mix",
         juce::NormalisableRange<float>(0.0f, 1.0f, 0.01f), 0.5f));
 
-    params.push_back(std::make_unique<juce::AudioParameterFloat>("harmonicAmount", "Harmonic Saturation",
-        juce::NormalisableRange<float>(0.0f, 1.0f, 0.01f), 0.15f));
+    params.push_back(std::make_unique<juce::AudioParameterFloat>("harmonicAmount", "LFO Rate",
+        juce::NormalisableRange<float>(0.1f, 20.0f, 0.01f, 0.3f), 2.0f)); // Exponential skew for musical rates
 
-    params.push_back(std::make_unique<juce::AudioParameterFloat>("subharmonicDepth", "Subharmonic Depth",
-        juce::NormalisableRange<float>(0.0f, 1.0f, 0.01f), 0.1f));
+    params.push_back(std::make_unique<juce::AudioParameterFloat>("subharmonicDepth", "LFO Depth",
+        juce::NormalisableRange<float>(0.0f, 1.0f, 0.01f), 0.3f));
 
     params.push_back(std::make_unique<juce::AudioParameterFloat>("masterVolume", "Master Volume",
         juce::NormalisableRange<float>(0.0f, 1.0f, 0.01f), 0.7f));

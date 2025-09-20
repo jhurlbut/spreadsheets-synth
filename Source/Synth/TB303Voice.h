@@ -10,15 +10,23 @@ public:
 
     void prepare(double sampleRate, int samplesPerBlock);
     float process(float input, float frequency);
-    void updateParameters(float harmonicAmount, float subharmonicDepth);
+    void updateParameters(float lfoRate, float lfoDepth);
     void reset();
 
 private:
     double sampleRate { 44100.0 };
 
-    // Parameters from XY pad
-    float harmonicAmount { 0.15f };   // X-axis: overtone saturation
-    float subharmonicDepth { 0.1f };  // Y-axis: undertone depth
+    // LFO parameters from XY pad
+    float lfoRate { 2.0f };      // X-axis: LFO speed in Hz (0.1 to 20 Hz)
+    float lfoDepth { 0.5f };     // Y-axis: LFO modulation depth (0-1)
+    
+    // LFO state
+    float lfoPhase { 0.0f };
+    float lfoPhase2 { 0.0f };    // Second LFO with phase offset for subharmonics
+    
+    // Base harmonic levels (modulated by LFO)
+    static constexpr float baseHarmonicAmount { 0.4f };
+    static constexpr float baseSubharmonicDepth { 0.3f };
 
     // Subharmonic generation
     float subPhase { 0.0f };
@@ -58,7 +66,7 @@ public:
     void updateParameters (float cutoff, float resonance, float decay,
                            float accent, float overdrive, int waveform);
 
-    void updateHarmonicParameters(float harmonicAmount, float subharmonicDepth);
+    void updateHarmonicParameters(float lfoRate, float lfoDepth);
 
 private:
     enum class Waveform { Sawtooth, Square };

@@ -448,15 +448,18 @@ void SpreadsheetsSynthEditor::randomizePattern()
     if (phaserMixParam)
         phaserMixParam->setValueNotifyingHost(random.nextFloat() * 0.3f); // 0-30% range
 
-    // Randomize harmonic XY pad parameters
-    auto* harmonicAmountParam = audioProcessor.getAPVTS().getParameter("harmonicAmount");
-    auto* subharmonicDepthParam = audioProcessor.getAPVTS().getParameter("subharmonicDepth");
+    // Randomize LFO XY pad parameters
+    auto* harmonicAmountParam = audioProcessor.getAPVTS().getParameter("harmonicAmount");  // LFO Rate
+    auto* subharmonicDepthParam = audioProcessor.getAPVTS().getParameter("subharmonicDepth");  // LFO Depth
 
-    if (harmonicAmountParam)
-        harmonicAmountParam->setValueNotifyingHost(random.nextFloat() * 0.7f + 0.1f); // 10-80% range for noticeable effect
+    if (harmonicAmountParam) {
+        // Convert to 0-1 range for the parameter (0.1-20 Hz mapped to 0-1)
+        float normalizedRate = (std::pow(10.0f, random.nextFloat() * 2.3f) * 0.1f - 0.1f) / 19.9f;
+        harmonicAmountParam->setValueNotifyingHost(normalizedRate);
+    }
 
     if (subharmonicDepthParam)
-        subharmonicDepthParam->setValueNotifyingHost(random.nextFloat() * 0.6f); // 0-60% range for sub bass
+        subharmonicDepthParam->setValueNotifyingHost(random.nextFloat() * 0.7f + 0.1f); // 10-80% depth for noticeable modulation
 
     // Randomize sequencer pattern
     int baseNote = 36 + random.nextInt(12); // C2 to B2

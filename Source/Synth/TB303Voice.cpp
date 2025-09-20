@@ -23,10 +23,10 @@ void HarmonicProcessor::reset()
     oversampler->reset();
 }
 
-void HarmonicProcessor::updateParameters(float harmAmount, float subDepth)
+void HarmonicProcessor::updateParameters(float rate, float depth)
 {
-    harmonicAmount = harmAmount;
-    subharmonicDepth = subDepth;
+    lfoRate = rate;
+    lfoDepth = depth;
 }
 
 float HarmonicProcessor::asymmetricTanh(float x, float drive, float asymmetry)
@@ -48,27 +48,49 @@ float HarmonicProcessor::chebyshevMix(float x, float amount)
 float HarmonicProcessor::process(float input, float frequency)
 {
     float output = input;
+    
+    // Update LFO phases
+    lfoPhase += (lfoRate * 2.0f * juce::MathConstants<float>::pi) / sampleRate;
+    if (lfoPhase > juce::MathConstants<float>::twoPi)
+        lfoPhase -= juce::MathConstants<float>::twoPi;
+    
+    // Second LFO with 90-degree phase offset for complex modulation
+    lfoPhase2 = lfoPhase + juce::MathConstants<float>::halfPi;
+    if (lfoPhase2 > juce::MathConstants<float>::twoPi)
+        lfoPhase2 -= juce::MathConstants<float>::twoPi;
+    
+    // Calculate modulated parameters
+    float lfoValue1 = std::sin(lfoPhase) * lfoDepth;
+    float lfoValue2 = std::sin(lfoPhase2) * lfoDepth;
+    
+    // Modulate harmonic amount (0 to baseHarmonicAmount + modulation)
+    float modulatedHarmonicAmount = baseHarmonicAmount * (1.0f + lfoValue1);
+    modulatedHarmonicAmount = juce::jlimit(0.0f, 1.0f, modulatedHarmonicAmount);
+    
+    // Modulate subharmonic depth with inverted LFO for interesting movement
+    float modulatedSubharmonicDepth = baseSubharmonicDepth * (1.0f + lfoValue2 * 0.7f);
+    modulatedSubharmonicDepth = juce::jlimit(0.0f, 1.0f, modulatedSubharmonicDepth);
 
-    // A. Generate subharmonics (Y-axis control)
-    if (subharmonicDepth > 0.01f)
+    // A. Generate subharmonics (modulated by LFO)
+    if (modulatedSubharmonicDepth > 0.01f)
     {
         // Sub-octave (f/2)
         subPhase += (frequency * 0.5f * 2.0f * juce::MathConstants<float>::pi) / sampleRate;
         if (subPhase > juce::MathConstants<float>::twoPi)
             subPhase -= juce::MathConstants<float>::twoPi;
-        float sub1 = std::sin(subPhase) * subharmonicDepth * 0.7f;  // Increased from 0.3f
+        float sub1 = std::sin(subPhase) * modulatedSubharmonicDepth * 0.7f;
 
         // Sub-sub-octave (f/4)
         subPhase2 += (frequency * 0.25f * 2.0f * juce::MathConstants<float>::pi) / sampleRate;
         if (subPhase2 > juce::MathConstants<float>::twoPi)
             subPhase2 -= juce::MathConstants<float>::twoPi;
-        float sub2 = std::sin(subPhase2) * subharmonicDepth * 0.4f;  // Increased from 0.15f
+        float sub2 = std::sin(subPhase2) * modulatedSubharmonicDepth * 0.4f;
 
         output += sub1 + sub2;
     }
 
-    // B. Apply waveshaping for overtones (X-axis control)
-    if (harmonicAmount > 0.01f)
+    // B. Apply waveshaping for overtones (modulated by LFO)
+    if (modulatedHarmonicAmount > 0.01f)
     {
         // Create a single-sample audio block for oversampling
         float* data = &output;
@@ -80,13 +102,13 @@ float HarmonicProcessor::process(float input, float frequency)
         {
             float sample = oversampledData[i];
 
-            // Asymmetric tanh for even/odd harmonics
-            float drive = 1.0f + harmonicAmount * 8.0f;  // Increased from 3.0f
-            float asymmetry = harmonicAmount * 0.5f;  // Increased from 0.2f
+            // Asymmetric tanh for even/odd harmonics (using modulated amount)
+            float drive = 1.0f + modulatedHarmonicAmount * 8.0f;
+            float asymmetry = modulatedHarmonicAmount * 0.5f;
             float shaped = asymmetricTanh(sample, drive, asymmetry);
 
             // Add Chebyshev harmonics
-            shaped = chebyshevMix(shaped, harmonicAmount);
+            shaped = chebyshevMix(shaped, modulatedHarmonicAmount);
 
             oversampledData[i] = shaped;
         }
@@ -94,8 +116,8 @@ float HarmonicProcessor::process(float input, float frequency)
         oversampler->processSamplesDown(block);
         output = *data;
 
-        // Mix dry/wet (more aggressive effect)
-        output = input * (1.0f - harmonicAmount * 0.7f) + output * (0.3f + harmonicAmount * 0.7f);
+        // Mix dry/wet (using modulated amount)
+        output = input * (1.0f - modulatedHarmonicAmount * 0.7f) + output * (0.3f + modulatedHarmonicAmount * 0.7f);
     }
 
     lastSample = output;
@@ -166,9 +188,9 @@ void TB303Voice::updateOscillator()
     // Square wave now uses PolyBLEP, so we don't need to reinitialize here
 }
 
-void TB303Voice::updateHarmonicParameters(float harmonicAmount, float subharmonicDepth)
+void TB303Voice::updateHarmonicParameters(float lfoRate, float lfoDepth)
 {
-    harmonicProcessor.updateParameters(harmonicAmount, subharmonicDepth);
+    harmonicProcessor.updateParameters(lfoRate, lfoDepth);
 }
 
 float TB303Voice::polyBLEP(float phase, float phaseInc)
