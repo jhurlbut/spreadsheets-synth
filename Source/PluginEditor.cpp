@@ -149,8 +149,7 @@ void SpreadsheetsSynthEditor::setupSlider(juce::Slider& slider, const juce::Stri
         slider.setTooltip("Resonance of phaser");
     else if (paramID == "phaserMix")
         slider.setTooltip("Wet/dry balance for phaser");
-    else if (paramID == "combFilterMix")
-        slider.setTooltip("Wet/dry balance for comb filter");
+    // Harmonic parameters controlled by XY pad
     else if (paramID == "masterVolume")
         slider.setTooltip("Overall output volume");
 
@@ -204,8 +203,7 @@ void SpreadsheetsSynthEditor::paint (juce::Graphics& g)
     g.setColour(juce::Colours::white.withAlpha(0.8f));
     g.drawText(">SYNTH_PARAMS", 10, 195, 150, 15, juce::Justification::left);
     g.drawText(">SEQ_MATRIX", 10, 365, 150, 15, juce::Justification::left);
-    g.drawText(">COMB_FILTER", 10, 510, 100, 20, juce::Justification::left);
-    g.drawText("[MIX]", 200, 570, 50, 20, juce::Justification::centred);
+    g.drawText(">HARM0N1CS", 10, 510, 100, 20, juce::Justification::left);
 
     // Draw corner brackets for terminal window effect
     g.setFont(juce::Font(juce::Font::getDefaultMonospacedFontName(), 14.0f, juce::Font::plain));
@@ -449,6 +447,16 @@ void SpreadsheetsSynthEditor::randomizePattern()
 
     if (phaserMixParam)
         phaserMixParam->setValueNotifyingHost(random.nextFloat() * 0.3f); // 0-30% range
+
+    // Randomize harmonic XY pad parameters
+    auto* harmonicAmountParam = audioProcessor.getAPVTS().getParameter("harmonicAmount");
+    auto* subharmonicDepthParam = audioProcessor.getAPVTS().getParameter("subharmonicDepth");
+
+    if (harmonicAmountParam)
+        harmonicAmountParam->setValueNotifyingHost(random.nextFloat() * 0.7f + 0.1f); // 10-80% range for noticeable effect
+
+    if (subharmonicDepthParam)
+        subharmonicDepthParam->setValueNotifyingHost(random.nextFloat() * 0.6f); // 0-60% range for sub bass
 
     // Randomize sequencer pattern
     int baseNote = 36 + random.nextInt(12); // C2 to B2

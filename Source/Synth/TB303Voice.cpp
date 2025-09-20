@@ -41,7 +41,8 @@ float HarmonicProcessor::chebyshevMix(float x, float amount)
     x = juce::jlimit(-1.0f, 1.0f, x);
     float T2 = 2.0f * x * x - 1.0f;  // 2nd harmonic
     float T3 = 4.0f * x * x * x - 3.0f * x;  // 3rd harmonic
-    return x + (T2 * amount * 0.05f) + (T3 * amount * 0.03f);
+    float T4 = 8.0f * x * x * x * x - 8.0f * x * x + 1.0f;  // 4th harmonic
+    return x + (T2 * amount * 0.2f) + (T3 * amount * 0.15f) + (T4 * amount * 0.1f);  // Much stronger harmonics
 }
 
 float HarmonicProcessor::process(float input, float frequency)
@@ -55,13 +56,13 @@ float HarmonicProcessor::process(float input, float frequency)
         subPhase += (frequency * 0.5f * 2.0f * juce::MathConstants<float>::pi) / sampleRate;
         if (subPhase > juce::MathConstants<float>::twoPi)
             subPhase -= juce::MathConstants<float>::twoPi;
-        float sub1 = std::sin(subPhase) * subharmonicDepth * 0.3f;
+        float sub1 = std::sin(subPhase) * subharmonicDepth * 0.7f;  // Increased from 0.3f
 
         // Sub-sub-octave (f/4)
         subPhase2 += (frequency * 0.25f * 2.0f * juce::MathConstants<float>::pi) / sampleRate;
         if (subPhase2 > juce::MathConstants<float>::twoPi)
             subPhase2 -= juce::MathConstants<float>::twoPi;
-        float sub2 = std::sin(subPhase2) * subharmonicDepth * 0.15f;
+        float sub2 = std::sin(subPhase2) * subharmonicDepth * 0.4f;  // Increased from 0.15f
 
         output += sub1 + sub2;
     }
@@ -80,8 +81,8 @@ float HarmonicProcessor::process(float input, float frequency)
             float sample = oversampledData[i];
 
             // Asymmetric tanh for even/odd harmonics
-            float drive = 1.0f + harmonicAmount * 3.0f;
-            float asymmetry = harmonicAmount * 0.2f;
+            float drive = 1.0f + harmonicAmount * 8.0f;  // Increased from 3.0f
+            float asymmetry = harmonicAmount * 0.5f;  // Increased from 0.2f
             float shaped = asymmetricTanh(sample, drive, asymmetry);
 
             // Add Chebyshev harmonics
@@ -93,8 +94,8 @@ float HarmonicProcessor::process(float input, float frequency)
         oversampler->processSamplesDown(block);
         output = *data;
 
-        // Mix dry/wet (subtle effect)
-        output = input * (1.0f - harmonicAmount * 0.3f) + output * harmonicAmount * 0.3f;
+        // Mix dry/wet (more aggressive effect)
+        output = input * (1.0f - harmonicAmount * 0.7f) + output * (0.3f + harmonicAmount * 0.7f);
     }
 
     lastSample = output;

@@ -64,7 +64,7 @@ The resistance is [REDACTED].
 
 CONNECT
 
-📡 https://www.instagram.com/spreadsheets_band/
+📡 https://www.instagram.com/spreadsheetsbeats/
 
 ---
 "Somewhere in California, a group of friends decided to form a band. They called themselves Spreadsheets, and they made music that sounded like the future had already happened."
